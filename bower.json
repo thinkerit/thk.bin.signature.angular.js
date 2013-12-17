@@ -1,9 +1,8 @@
 {
     "name": "thk.bin.signature.angular",
-    "version": "0.0.0",
     "main": "./src/main/js/thk.signature.js",
     "dependencies": {
-        "angular": "1.0.7"
+        "angular": "1.2.5"
     },
     "ignore": [
         "**/.*",
