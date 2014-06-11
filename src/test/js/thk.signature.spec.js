@@ -1,31 +1,53 @@
 describe('thk.signature', function () {
 
     describe('thkSignature directive', function() {
-        var directive, resolver;
+        var directive, scope, waitFor;
 
-        beforeEach(function() {
-            resolver = {
-                resolve:function(args, callback) {
-                    resolver.args = args;
-                    resolver.callback = callback;
-                }
+        beforeEach(inject(function($rootScope, $interval) {
+            scope = $rootScope.$new();
+            waitFor = function (ms) {
+                $interval.flush(ms);
             };
-            directive = ThkSignatureDirectiveFactory(resolver);
+            directive = ThkSignatureDirectiveFactory($interval);
+        }));
+
+        it('restrict to attribute or element', function () {
+            expect(directive.restrict).toEqual('AE');
         });
 
-        it('template url', function() {
-            expect(directive.template).toEqual('<div style="position: relative;">' +
-                '<script>' +
-                '$(function(){' +
-                'setInterval(function(){' +
-                '$("#thk-development-by").fadeToggle(1500);' +
-                '$("#thk-powered-by").fadeToggle(1500);' +
-                '},5000);' +
-                '});' +
-                '</script>' +
-                '<strong id="thk-development-by" style="position: absolute;right:0;"> Development by <a href="http://thinkerit.be">thinkerIT</a> </strong>' +
-                '<strong id="thk-powered-by" style="position: absolute;right:0;display: none;"> Powered by <a href="http://binarta.com">Binarta</a> </strong>' +
-                '</div>');
+        it('use template', function() {
+            expect(directive.template).toEqual(
+                '<div style="position: relative;">' +
+                    '<strong ng-show="toggle" class="thk-signature" style="position: absolute;right:0;"> ' +
+                        'Development by <a href="http://thinkerit.be">thinkerIT</a> ' +
+                    '</strong>' +
+                    '<strong ng-hide="toggle" class="thk-signature" style="position: absolute;right:0;"> ' +
+                        'Powered by <a href="http://binarta.com">Binarta</a> ' +
+                    '</strong>' +
+                '</div>'
+            );
+        });
+
+        describe('link', function () {
+
+            beforeEach(function () {
+                directive.link(scope);
+            });
+
+            it('toggle flag is on scope', function () {
+                expect(scope.toggle).toEqual(true);
+            });
+
+            it('after delay flag is inverted', function () {
+                waitFor(5000);
+                expect(scope.toggle).toEqual(false);
+            });
+
+            it('after twice delay', function () {
+                waitFor(5000);
+                waitFor(5000);
+                expect(scope.toggle).toEqual(true);
+            });
         });
     });
 });
